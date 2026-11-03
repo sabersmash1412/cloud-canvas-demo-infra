@@ -25,6 +25,20 @@ module "main" {
   flow_log_max_aggregation_interval    = 60
 }
 
+# canvas:node id=q type=aws.sqs
+module "jobs" {
+  source  = "terraform-aws-modules/sqs/aws"
+  version = "~> 4.2"
+
+  name                       = "member-portal-dev-jobs"
+  fifo_queue                 = false
+  visibility_timeout_seconds = 30
+  create_dlq                 = true
+  redrive_policy = {
+    maxReceiveCount = 5
+  }
+}
+
 # canvas:node id=db type=aws.rds_postgres
 module "db" {
   source  = "terraform-aws-modules/rds/aws"
@@ -130,6 +144,17 @@ module "api" {
           container_port   = 8080
         }
       }
+      tasks_iam_role_statements = [
+        {
+          actions = [
+            "sqs:SendMessage",
+            "sqs:ReceiveMessage",
+            "sqs:DeleteMessage",
+            "sqs:GetQueueAttributes",
+          ]
+          resources = [module.jobs.queue_arn]
+        },
+      ]
     }
   }
 }
