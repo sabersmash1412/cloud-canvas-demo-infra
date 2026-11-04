@@ -25,6 +25,31 @@ module "main" {
   flow_log_max_aggregation_interval    = 60
 }
 
+# canvas:node id=audit type=aws.s3
+module "audit" {
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "~> 4.2"
+
+  bucket                   = "member-portal-dev-audit"
+  force_destroy            = false
+  control_object_ownership = true
+  object_ownership         = "BucketOwnerEnforced"
+  block_public_acls        = true
+  block_public_policy      = true
+  ignore_public_acls       = true
+  restrict_public_buckets  = true
+  versioning = {
+    enabled = true
+  }
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+}
+
 # canvas:node id=q type=aws.sqs
 module "jobs" {
   source  = "terraform-aws-modules/sqs/aws"
@@ -145,6 +170,10 @@ module "api" {
         }
       }
       tasks_iam_role_statements = [
+        {
+          actions   = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:ListBucket"]
+          resources = [module.audit.s3_bucket_arn, "${module.audit.s3_bucket_arn}/*"]
+        },
         {
           actions = [
             "sqs:SendMessage",
