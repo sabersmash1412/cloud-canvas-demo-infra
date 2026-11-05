@@ -124,9 +124,9 @@ module "api" {
   }
   services = {
     api = {
-      cpu                    = 512
-      memory                 = 1024
-      desired_count          = 2
+      cpu                    = 1024
+      memory                 = 2048
+      desired_count          = 4
       subnet_ids             = module.main.private_subnets
       assign_public_ip       = false
       enable_execute_command = false
