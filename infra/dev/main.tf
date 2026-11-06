@@ -25,6 +25,17 @@ module "main" {
   flow_log_max_aggregation_interval    = 60
 }
 
+# canvas:node id=cert type=aws.acm
+module "cert" {
+  source  = "terraform-aws-modules/acm/aws"
+  version = "~> 5.1"
+
+  domain_name            = "portal.example.gov.sg"
+  validation_method      = "DNS"
+  create_route53_records = false
+  validate_certificate   = false
+}
+
 # canvas:node id=audit type=aws.s3
 module "audit" {
   source  = "terraform-aws-modules/s3-bucket/aws"
@@ -209,6 +220,13 @@ module "web" {
       description = "HTTP"
       cidr_ipv4   = "0.0.0.0/0"
     }
+    https = {
+      from_port   = 443
+      to_port     = 443
+      ip_protocol = "tcp"
+      description = "HTTPS"
+      cidr_ipv4   = "0.0.0.0/0"
+    }
   }
   security_group_egress_rules = {
     all = {
@@ -217,9 +235,20 @@ module "web" {
     }
   }
   listeners = {
-    http = {
+    http_redirect = {
       port     = 80
       protocol = "HTTP"
+      redirect = {
+        port        = "443"
+        protocol    = "HTTPS"
+        status_code = "HTTP_301"
+      }
+    }
+    https = {
+      port            = 443
+      protocol        = "HTTPS"
+      ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+      certificate_arn = module.cert.acm_certificate_arn
       forward = {
         target_group_key = "api"
       }
