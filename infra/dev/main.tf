@@ -85,13 +85,13 @@ module "db" {
   engine_version               = "16.4"
   family                       = "postgres16"
   major_engine_version         = "16"
-  instance_class               = "db.t4g.medium"
+  instance_class               = "db.t4g.micro"
   allocated_storage            = 50
   db_name                      = "app"
   username                     = "app_admin"
   port                         = 5432
   manage_master_user_password  = true
-  multi_az                     = true
+  multi_az                     = false
   storage_encrypted            = true
   create_db_subnet_group       = false
   db_subnet_group_name         = module.main.database_subnet_group_name
