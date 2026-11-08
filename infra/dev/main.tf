@@ -7,13 +7,13 @@ module "main" {
 
   name                                 = "member-portal-dev-main"
   cidr                                 = "10.20.0.0/16"
-  azs                                  = ["ap-southeast-1a", "ap-southeast-1b"]
-  public_subnets                       = ["10.20.0.0/24", "10.20.1.0/24"]
-  public_subnet_names                  = ["public-a", "public-b"]
-  private_subnets                      = ["10.20.10.0/24", "10.20.11.0/24"]
-  private_subnet_names                 = ["private-a", "private-b"]
-  database_subnets                     = ["10.20.20.0/24", "10.20.21.0/24"]
-  database_subnet_names                = ["database-a", "database-b"]
+  azs                                  = ["ap-southeast-1a", "ap-southeast-1b", "ap-southeast-1c"]
+  public_subnets                       = ["10.20.0.0/24", "10.20.1.0/24", "10.20.2.0/24"]
+  public_subnet_names                  = ["public-a", "public-b", "public-c"]
+  private_subnets                      = ["10.20.10.0/24", "10.20.11.0/24", "10.20.12.0/24"]
+  private_subnet_names                 = ["private-a", "private-b", "private-c"]
+  database_subnets                     = ["10.20.20.0/24", "10.20.21.0/24", "10.20.22.0/24"]
+  database_subnet_names                = ["database-a", "database-b", "database-c"]
   create_database_subnet_group         = true
   enable_nat_gateway                   = true
   single_nat_gateway                   = true
