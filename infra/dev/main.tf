@@ -206,9 +206,9 @@ module "web" {
 
   name                       = "member-portal-dev-web"
   load_balancer_type         = "application"
-  internal                   = false
+  internal                   = true
   vpc_id                     = module.main.vpc_id
-  subnets                    = module.main.public_subnets
+  subnets                    = module.main.private_subnets
   idle_timeout               = 60
   enable_deletion_protection = false
   drop_invalid_header_fields = true
@@ -218,14 +218,14 @@ module "web" {
       to_port     = 80
       ip_protocol = "tcp"
       description = "HTTP"
-      cidr_ipv4   = "0.0.0.0/0"
+      cidr_ipv4   = module.main.vpc_cidr_block
     }
     https = {
       from_port   = 443
       to_port     = 443
       ip_protocol = "tcp"
       description = "HTTPS"
-      cidr_ipv4   = "0.0.0.0/0"
+      cidr_ipv4   = module.main.vpc_cidr_block
     }
   }
   security_group_egress_rules = {
