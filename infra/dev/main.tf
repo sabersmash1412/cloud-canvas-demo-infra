@@ -61,20 +61,6 @@ module "audit" {
   }
 }
 
-# canvas:node id=q type=aws.sqs
-module "jobs" {
-  source  = "terraform-aws-modules/sqs/aws"
-  version = "~> 4.2"
-
-  name                       = "member-portal-dev-jobs"
-  fifo_queue                 = false
-  visibility_timeout_seconds = 30
-  create_dlq                 = true
-  redrive_policy = {
-    maxReceiveCount = 5
-  }
-}
-
 # canvas:node id=db type=aws.rds_postgres
 module "db" {
   source  = "terraform-aws-modules/rds/aws"
@@ -184,15 +170,6 @@ module "api" {
         {
           actions   = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:ListBucket"]
           resources = [module.audit.s3_bucket_arn, "${module.audit.s3_bucket_arn}/*"]
-        },
-        {
-          actions = [
-            "sqs:SendMessage",
-            "sqs:ReceiveMessage",
-            "sqs:DeleteMessage",
-            "sqs:GetQueueAttributes",
-          ]
-          resources = [module.jobs.queue_arn]
         },
       ]
     }
